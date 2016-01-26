@@ -22,7 +22,8 @@ public class HttpRequest implements Request {
     private Integer connectTimeout;
     private Integer readTimeout;
     private Boolean followRedirects;
-    private String character = "UTF-8";
+    private String character;
+    private String responseCharacter;
     private Map<String, String> requestHeaders = new HashMap<>();
     private String method = HttpMethod.GET;
     private String boundary;
@@ -78,6 +79,12 @@ public class HttpRequest implements Request {
     @Override
     public Request character(String character) {
         this.character = character;
+        return this;
+    }
+
+    @Override
+    public Request responseCharacter(String character) {
+        this.responseCharacter = character;
         return this;
     }
 
@@ -266,7 +273,7 @@ public class HttpRequest implements Request {
                     }
                 }
             }
-            return new HttpResponse(httpUrl);
+            return new HttpResponse(httpUrl).character(this.responseCharacter);
         } catch (IOException e) {
             e.printStackTrace();
         }

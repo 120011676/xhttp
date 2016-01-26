@@ -96,7 +96,6 @@ public class HttpResponse implements Response {
 
     @Override
     public String dataToString() {
-        String charset = charset(this.contentType());
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); InputStream in = this.data()) {
             byte[] b = new byte[4096];
             if (in != null) {
@@ -104,19 +103,20 @@ public class HttpResponse implements Response {
                     baos.write(b, 0, n);
                 }
             }
-            if (this.character == null && charset == null) {
-                Pattern p = Pattern.compile("(?<=<meta http-equiv=\"content-type\" content=\").*?(?=\")");
-                String html = new String(baos.toByteArray());
-                Matcher m = p.matcher(html);
-                if (m.find()) {
-                    return new String(baos.toByteArray(), charset(m.group()));
+            if (this.character == null) {
+                String charset = charset(this.contentType());
+                if (charset == null) {
+                    Pattern p = Pattern.compile("(?<=<meta http-equiv=\"content-type\" content=\").*?(?=\")");
+                    String html = new String(baos.toByteArray());
+                    Matcher m = p.matcher(html);
+                    if (m.find()) {
+                        return new String(baos.toByteArray(), charset(m.group()));
+                    }
+                    return html;
                 }
-                return html;
-            } else if (this.character != null) {
-                return new String(baos.toByteArray(), this.character);
-            } else {
                 return new String(baos.toByteArray(), charset);
             }
+            return new String(baos.toByteArray(), this.character);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
