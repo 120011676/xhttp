@@ -97,10 +97,8 @@ public class HttpResponse implements Response {
     @Override
     public String dataToString() {
         String charset = charset(this.contentType());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] b = new byte[4096];
-        try {
-            InputStream in = this.data();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); InputStream in = this.data()) {
+            byte[] b = new byte[4096];
             if (in != null) {
                 for (int n; (n = in.read(b)) != -1; ) {
                     baos.write(b, 0, n);
@@ -122,11 +120,6 @@ public class HttpResponse implements Response {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                baos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             this.close();
         }
         return null;

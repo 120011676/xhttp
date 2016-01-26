@@ -12,7 +12,7 @@ public class XHttpTest {
 //        String r = XHttp.url("http://www.mytju.com/classCode/tools/encode_gb2312.asp").get().dataToString();
 //        System.out.println(r);
 
-        System.out.println(XHttp.url("http://www.baidu.com/s").userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36").data("wd","ss&sc").get().dataToString());
+        System.out.println(XHttp.url("https://www.baidu.com/s").userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36").data("wd","ss&sc").get().dataToString());
 
 
 //        String r = XHttp.url("https://www.icloud.com/").data("wd","ss").get().dataToString();
