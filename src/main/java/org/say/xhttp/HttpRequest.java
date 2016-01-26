@@ -5,10 +5,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +16,7 @@ import java.util.Map;
  */
 public class HttpRequest implements Request {
     private String urlStr;
+    private Proxy proxy;
     private SSLSocketFactory sslsf;
     private HostnameVerifier hv;
     private Integer connectTimeout;
@@ -38,6 +36,12 @@ public class HttpRequest implements Request {
     @Override
     public Request url(String url) {
         this.urlStr = url;
+        return this;
+    }
+
+    @Override
+    public Request proxy(Proxy proxy) {
+        this.proxy = proxy;
         return this;
     }
 
@@ -228,7 +232,8 @@ public class HttpRequest implements Request {
             if (this.boundary != null) {
                 baos.write((this.boundary + "--").getBytes());
             }
-            URLConnection urlConn = new URL(this.urlStr).openConnection();
+            URL url = new URL(this.urlStr);
+            URLConnection urlConn = this.proxy != null ? url.openConnection(this.proxy) : url.openConnection();
             if (urlConn instanceof HttpsURLConnection) {
                 HttpsURLConnection httpsConn = (HttpsURLConnection) urlConn;
                 if (this.sslsf != null) {

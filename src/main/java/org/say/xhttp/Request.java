@@ -3,6 +3,7 @@ package org.say.xhttp;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
+import java.net.Proxy;
 import java.util.Map;
 
 /**
@@ -10,6 +11,8 @@ import java.util.Map;
  */
 public interface Request {
     Request url(String url);
+
+    Request proxy(Proxy proxy);
 
     Request sslSocketFactory(SSLSocketFactory sslsf);
 
