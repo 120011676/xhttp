@@ -20,6 +20,9 @@ public class XHttp {
     public static Request url(String url) {
         Request req = new HttpRequest().url(url);
         if (CONFIG != null) {
+            req.sslSocketFactory(CONFIG.getSslSocketFactory());
+            req.hostnameVerifier(CONFIG.getHostnameVerifier());
+            req.userAgent(CONFIG.getUserAgent());
             req.connectTimeout(CONFIG.getConnectTimeout());
             req.readTimeout(CONFIG.getReadTimeout());
             req.followRedirects(CONFIG.getFollowRedirects());

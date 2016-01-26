@@ -1,5 +1,7 @@
 package org.say.xhttp;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.util.Map;
 
@@ -8,6 +10,10 @@ import java.util.Map;
  */
 public interface Request {
     Request url(String url);
+
+    Request sslSocketFactory(SSLSocketFactory sslsf);
+
+    Request hostnameVerifier(HostnameVerifier hv);
 
     Request connectTimeout(int timeout);
 

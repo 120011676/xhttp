@@ -1,6 +1,9 @@
 package org.say.xhttp;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -16,6 +19,8 @@ import java.util.Map;
  */
 public class HttpRequest implements Request {
     private String urlStr;
+    private SSLSocketFactory sslsf;
+    private HostnameVerifier hv;
     private Integer connectTimeout;
     private Integer readTimeout;
     private Boolean followRedirects;
@@ -33,6 +38,18 @@ public class HttpRequest implements Request {
     @Override
     public Request url(String url) {
         this.urlStr = url;
+        return this;
+    }
+
+    @Override
+    public Request sslSocketFactory(SSLSocketFactory sslsf) {
+        this.sslsf = sslsf;
+        return this;
+    }
+
+    @Override
+    public Request hostnameVerifier(HostnameVerifier hv) {
+        this.hv = hv;
         return this;
     }
 
@@ -212,6 +229,15 @@ public class HttpRequest implements Request {
                 baos.write((this.boundary + "--").getBytes());
             }
             URLConnection urlConn = new URL(this.urlStr).openConnection();
+            if (urlConn instanceof HttpsURLConnection) {
+                HttpsURLConnection httpsConn = (HttpsURLConnection) urlConn;
+                if (this.sslsf != null) {
+                    httpsConn.setSSLSocketFactory(this.sslsf);
+                }
+                if (this.hv != null) {
+                    httpsConn.setHostnameVerifier(this.hv);
+                }
+            }
             HttpURLConnection httpUrl = (HttpURLConnection) urlConn;
             if (connectTimeout != null) {
                 httpUrl.setConnectTimeout(connectTimeout);
