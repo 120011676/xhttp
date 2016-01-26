@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -153,7 +154,8 @@ public class HttpRequest implements Request {
                                 if (this.boundary != null) {
                                     baos.write(this.boundary.getBytes());
                                     baos.write("\r\n".getBytes());
-                                    baos.write(("Content-Disposition: form-data; name=\"" + k + "\"; filename=\"" + f.getName() + "\"").getBytes());
+                                    String cd = ("Content-Disposition: form-data; name=\"" + k + "\"; filename=\"" + f.getName() + "\"");
+                                    baos.write(this.character != null ? cd.getBytes(this.character) : cd.getBytes());
                                     baos.write("\r\n".getBytes());
                                     baos.write(("Content-Type: " + new MimetypesFileTypeMap().getContentType(f)).getBytes());
                                     baos.write("\r\n\r\n".getBytes());
@@ -170,19 +172,21 @@ public class HttpRequest implements Request {
                                     if (this.boundary != null) {
                                         baos.write(this.boundary.getBytes());
                                         baos.write("\r\n".getBytes());
-                                        baos.write(("Content-Disposition: form-data; name=\"" + k + "\"").getBytes());
+                                        String cd = ("Content-Disposition: form-data; name=\"" + k + "\"");
+                                        baos.write(this.character != null ? cd.getBytes(this.character) : cd.getBytes());
                                         baos.write("\r\n\r\n".getBytes());
                                         baos.write(v.getBytes());
                                     } else {
                                         if (baos.size() > 0) {
                                             baos.write('&');
                                         }
-                                        baos.write((k + "=" + v).getBytes());
+                                        String kv = (k + "=" + v);
+                                        baos.write(this.character != null ? kv.getBytes(this.character) : kv.getBytes());
                                     }
                                 } else if (HttpMethod.GET.equals(this.method.toUpperCase())) {
                                     this.urlStr += !this.urlStr.contains("?") ?
                                             '?' : '&';
-                                    this.urlStr += k + "=" + v;
+                                    this.urlStr += (this.character != null ? URLEncoder.encode(k, this.character) : k) + "=" + (this.character != null ? URLEncoder.encode(v, this.character) : v);
                                 }
                             }
                         }
@@ -191,14 +195,15 @@ public class HttpRequest implements Request {
                         if (HttpMethod.POST.equals(this.method.toUpperCase())) {
                             baos.write(bs);
                         } else if (HttpMethod.GET.equals(this.method.toUpperCase())) {
-                            this.urlStr += new String(bs);
+                            String v = (this.character != null ? new String(bs, this.character) : new String(bs));
+                            this.urlStr += (this.urlStr.contains("?") ? '&' : '?') + (this.character != null ? URLEncoder.encode(v, this.character) : v);
                         }
                     } else if (obj instanceof String) {
                         String v = (String) obj;
                         if (HttpMethod.POST.equals(this.method.toUpperCase())) {
-                            baos.write(v.getBytes());
+                            baos.write(this.character != null ? v.getBytes(this.character) : v.getBytes());
                         } else if (HttpMethod.GET.equals(this.method.toUpperCase())) {
-                            this.urlStr += v;
+                            this.urlStr += (this.urlStr.contains("?") ? '&' : '?') + (this.character != null ? URLEncoder.encode(v, this.character) : v);
                         }
                     }
                 }
