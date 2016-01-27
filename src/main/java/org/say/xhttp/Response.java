@@ -1,7 +1,6 @@
 package org.say.xhttp;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,7 +12,7 @@ public interface Response {
 
     String header(String name);
 
-    Map<String,List<String>> header();
+    Map header();
 
     String contentType();
 

@@ -6,10 +6,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by say on 1/20/16.
@@ -24,11 +21,11 @@ public class HttpRequest implements Request {
     private Boolean followRedirects;
     private String character;
     private String responseCharacter;
-    private Map<String, String> requestHeaders = new HashMap<String, String>();
+    private Map requestHeaders = new HashMap();
     private String method = HttpMethod.GET;
     private String boundary;
     private final static String LOGO = "xhttp";
-    private List<Object> data = new ArrayList<Object>();
+    private List data = new ArrayList();
 
     {
         this.userAgent(LOGO);
@@ -60,19 +57,19 @@ public class HttpRequest implements Request {
 
 
     public Request connectTimeout(int timeout) {
-        this.connectTimeout = timeout;
+        this.connectTimeout = new Integer(timeout);
         return this;
     }
 
 
     public Request readTimeout(int timeout) {
-        this.readTimeout = timeout;
+        this.readTimeout = new Integer(timeout);
         return this;
     }
 
 
     public Request followRedirects(boolean followRedirects) {
-        this.followRedirects = followRedirects;
+        this.followRedirects = new Boolean(followRedirects);
         return this;
     }
 
@@ -83,7 +80,7 @@ public class HttpRequest implements Request {
     }
 
 
-    public Map<String, String> header() {
+    public Map header() {
         return requestHeaders;
     }
 
@@ -125,7 +122,7 @@ public class HttpRequest implements Request {
 
 
     public Request data(String name, String value) {
-        Map<String, String> m = new HashMap<String, String>(1);
+        Map m = new HashMap(1);
         m.put(name, value);
         this.data.add(m);
         return this;
@@ -133,7 +130,7 @@ public class HttpRequest implements Request {
 
 
     public Request data(String name, File data) {
-        Map<String, File> m = new HashMap<String, File>(1);
+        Map m = new HashMap(1);
         m.put(name, data);
         this.data.add(m);
         if (requestHeaders.get(HttpHeader.CONTENT_TYPE) == null) {
@@ -166,11 +163,13 @@ public class HttpRequest implements Request {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (this.data != null && this.data.size() > 0) {
-                for (Object obj : this.data) {
+                for (int i = 0; i < this.data.size(); i++) {
+                    Object obj = this.data.get(i);
                     if (obj instanceof Map) {
-                        @SuppressWarnings("unchecked")
-                        Map<String, Object> m = (Map<String, Object>) obj;
-                        for (String k : m.keySet()) {
+                        Map m = (Map) obj;
+                        Iterator iterator = m.keySet().iterator();
+                        while (iterator.hasNext()) {
+                            String k = (String) iterator.next();
                             Object o = m.get(k);
                             if (o instanceof File) {
                                 File f = (File) o;
@@ -250,17 +249,19 @@ public class HttpRequest implements Request {
             }
             HttpURLConnection httpUrl = (HttpURLConnection) urlConn;
             if (connectTimeout != null) {
-                httpUrl.setConnectTimeout(connectTimeout);
+                httpUrl.setConnectTimeout(connectTimeout.intValue());
             }
             if (readTimeout != null) {
-                httpUrl.setReadTimeout(readTimeout);
+                httpUrl.setReadTimeout(readTimeout.intValue());
             }
             if (followRedirects != null) {
-                httpUrl.setInstanceFollowRedirects(followRedirects);
+                httpUrl.setInstanceFollowRedirects(followRedirects.booleanValue());
             }
             httpUrl.setRequestMethod(this.method);
-            for (String k : requestHeaders.keySet()) {
-                httpUrl.setRequestProperty(k, requestHeaders.get(k));
+            Iterator iterator = requestHeaders.keySet().iterator();
+            while (iterator.hasNext()) {
+                String k = (String) iterator.next();
+                httpUrl.setRequestProperty(k, (String) requestHeaders.get(k));
             }
             if (HttpMethod.POST.equals(this.method.toUpperCase())) {
                 if (baos.size() > 0) {

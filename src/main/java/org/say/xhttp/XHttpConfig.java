@@ -18,9 +18,9 @@ public class XHttpConfig {
             req.sslSocketFactory(config.getSslSocketFactory());
             req.hostnameVerifier(config.getHostnameVerifier());
             req.userAgent(config.getUserAgent());
-            req.connectTimeout(config.getConnectTimeout());
-            req.readTimeout(config.getReadTimeout());
-            req.followRedirects(config.getFollowRedirects());
+            req.connectTimeout(config.getConnectTimeout().intValue());
+            req.readTimeout(config.getReadTimeout().intValue());
+            req.followRedirects(config.getFollowRedirects().booleanValue());
             req.character(config.getRequestCharacter());
             req.responseCharacter(config.getResponseCharacter());
         }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,7 +36,7 @@ public class HttpResponse implements Response {
     }
 
 
-    public Map<String, List<String>> header() {
+    public Map header() {
         return this.httpUrl.getHeaderFields();
     }
 
@@ -84,8 +83,8 @@ public class HttpResponse implements Response {
     private String charset(String contentType) {
         if (contentType != null && contentType.length() > 0) {
             String[] vs = contentType.split(";");
-            for (String v : vs) {
-                String[] kv = v.split("=");
+            for (int i = 0; i < vs.length; i++) {
+                String[] kv = vs[i].split("=");
                 if ("CHARSET".equals(kv[0].toUpperCase())) {
                     return kv[1];
                 }

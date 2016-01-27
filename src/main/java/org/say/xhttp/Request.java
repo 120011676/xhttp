@@ -26,7 +26,7 @@ public interface Request {
 
     Request character(String character);
 
-    Map<String, String> header();
+    Map header();
 
     Request header(String name, String value);
 
