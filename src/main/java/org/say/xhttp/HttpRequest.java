@@ -24,116 +24,116 @@ public class HttpRequest implements Request {
     private Boolean followRedirects;
     private String character;
     private String responseCharacter;
-    private Map<String, String> requestHeaders = new HashMap<>();
+    private Map<String, String> requestHeaders = new HashMap<String, String>();
     private String method = HttpMethod.GET;
     private String boundary;
     private final static String LOGO = "xhttp";
-    private List<Object> data = new ArrayList<>();
+    private List<Object> data = new ArrayList<Object>();
 
     {
         this.userAgent(LOGO);
     }
 
-    @Override
+
     public Request url(String url) {
         this.urlStr = url;
         return this;
     }
 
-    @Override
+
     public Request proxy(Proxy proxy) {
         this.proxy = proxy;
         return this;
     }
 
-    @Override
+
     public Request sslSocketFactory(SSLSocketFactory sslsf) {
         this.sslsf = sslsf;
         return this;
     }
 
-    @Override
+
     public Request hostnameVerifier(HostnameVerifier hv) {
         this.hv = hv;
         return this;
     }
 
-    @Override
+
     public Request connectTimeout(int timeout) {
         this.connectTimeout = timeout;
         return this;
     }
 
-    @Override
+
     public Request readTimeout(int timeout) {
         this.readTimeout = timeout;
         return this;
     }
 
-    @Override
+
     public Request followRedirects(boolean followRedirects) {
         this.followRedirects = followRedirects;
         return this;
     }
 
-    @Override
+
     public Request character(String character) {
         this.character = character;
         return this;
     }
 
-    @Override
+
     public Map<String, String> header() {
         return requestHeaders;
     }
 
-    @Override
+
     public Request header(String name, String value) {
         this.requestHeaders.put(name, value);
         return this;
     }
 
-    @Override
+
     public Request userAgent(String userAgent) {
         requestHeaders.put(HttpHeader.USER_AGENT, userAgent);
         return this;
     }
 
-    @Override
+
     public Request contentType(String contentType) {
         requestHeaders.put(HttpHeader.CONTENT_TYPE, contentType);
         return this;
     }
 
-    @Override
+
     public Request cookie(String cookie) {
         requestHeaders.put(HttpHeader.COOKIE, cookie);
         return this;
     }
 
-    @Override
+
     public Request data(byte[] data) {
         this.data.add(data);
         return this;
     }
 
-    @Override
+
     public Request data(String data) {
         this.data.add(data);
         return this;
     }
 
-    @Override
+
     public Request data(String name, String value) {
-        Map<String, String> m = new HashMap<>(1);
+        Map<String, String> m = new HashMap<String, String>(1);
         m.put(name, value);
         this.data.add(m);
         return this;
     }
 
-    @Override
+
     public Request data(String name, File data) {
-        Map<String, File> m = new HashMap<>(1);
+        Map<String, File> m = new HashMap<String, File>(1);
         m.put(name, data);
         this.data.add(m);
         if (requestHeaders.get(HttpHeader.CONTENT_TYPE) == null) {
@@ -143,25 +143,25 @@ public class HttpRequest implements Request {
         return this;
     }
 
-    @Override
+
     public Request method(String method) {
         this.method = method;
         return this;
     }
 
-    @Override
+
     public Response get() {
         this.method = HttpMethod.GET;
         return this.execute();
     }
 
-    @Override
+
     public Response post() {
         this.method = HttpMethod.POST;
         return this.execute();
     }
 
-    @Override
+
     public Response execute() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -183,10 +183,13 @@ public class HttpRequest implements Request {
                                     baos.write(("Content-Type: " + new MimetypesFileTypeMap().getContentType(f)).getBytes());
                                     baos.write("\r\n\r\n".getBytes());
                                     byte[] b = new byte[4096];
-                                    try (BufferedInputStream bin = new BufferedInputStream(new FileInputStream(f))) {
+                                    BufferedInputStream bin = new BufferedInputStream(new FileInputStream(f));
+                                    try {
                                         for (int n; (n = bin.read(b)) != -1; ) {
                                             baos.write(b, 0, n);
                                         }
+                                    } finally {
+                                        bin.close();
                                     }
                                 }
                             } else if (o instanceof String) {
@@ -262,9 +265,12 @@ public class HttpRequest implements Request {
             if (HttpMethod.POST.equals(this.method.toUpperCase())) {
                 if (baos.size() > 0) {
                     httpUrl.setDoOutput(true);
-                    try (OutputStream out = httpUrl.getOutputStream()) {
+                    OutputStream out = httpUrl.getOutputStream();
+                    try {
                         out.write(baos.toByteArray());
                         out.flush();
+                    } finally {
+                        out.close();
                     }
                 }
             }
