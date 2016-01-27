@@ -16,7 +16,7 @@ public class HttpHeader {
     public final static String IF_NONE_MATCH = "If-None-Match";
     public final static String REFERER = "Referer";
     public final static String UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
-
+    public final static String AUTHORIZATION = "Authorization";
 
     public final static String SET_COOKIE = "Set-Cookie";
     public final static String Content_Encoding = "Content-Encoding";
