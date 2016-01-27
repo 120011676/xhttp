@@ -83,12 +83,6 @@ public class HttpRequest implements Request {
     }
 
     @Override
-    public Request responseCharacter(String character) {
-        this.responseCharacter = character;
-        return this;
-    }
-
-    @Override
     public Map<String, String> header() {
         return requestHeaders;
     }
@@ -278,5 +272,10 @@ public class HttpRequest implements Request {
             e.printStackTrace();
         }
         return null;
+    }
+
+    protected Request responseCharacter(String character) {
+        this.responseCharacter = character;
+        return this;
     }
 }
