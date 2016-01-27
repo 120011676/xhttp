@@ -168,6 +168,7 @@ public class HttpRequest implements Request {
             if (this.data != null && this.data.size() > 0) {
                 for (Object obj : this.data) {
                     if (obj instanceof Map) {
+                        @SuppressWarnings("unchecked")
                         Map<String, Object> m = (Map<String, Object>) obj;
                         for (String k : m.keySet()) {
                             Object o = m.get(k);
