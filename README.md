@@ -11,5 +11,5 @@ String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l
 String html = XHttp.url("https://www.baidu.com/s")
         .userAgent(userAgent)
         .data("wd", "ss&sc").get().dataToString();
-System.out.println(html)
+System.out.println(html);
 ```
