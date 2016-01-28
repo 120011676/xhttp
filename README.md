@@ -1,5 +1,5 @@
 # xhttp
-一个java http操作工
+一个java http操作工具
 
 # releases
 [v1.0.0](https://github.com/120011676/xhttp/releases)
