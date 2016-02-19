@@ -1,15 +1,13 @@
 group 'com.github.120011676'
-version '1.0.0-SNAPSHOT'
+version '1.0.0'
 
 apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
 apply plugin: 'maven'
-apply plugin: 'signing' //使用signing plugin做数字签名
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
-def jdkVersion = 1.8
-sourceCompatibility = jdkVersion
-targetCompatibility = jdkVersion
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -24,31 +22,61 @@ task "mkdirs" << {
     sourceSets*.resources.srcDirs*.each { it.mkdirs() }
 }
 
-def siteUrl = 'https://github.com/120011676/xhttp'      // 项目的主页
-def gitUrl = 'https://github.com/120011676/xhttp.git'   // Git仓库的url
+task source(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+        title "swipeJavaDoc"
+    }
+}
+
+task doc(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task mavenRelease(dependsOn: ['clean', 'doc', 'sources', 'jar']) {
+}
+
+artifacts {
+    archives jar
+    archives doc
+    archives source
+}
 
 uploadArchives {
     repositories {
         mavenDeployer {
-            //为Pom文件做数字签名
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            //指定项目部署到的中央库地址，UserName和Password就是Part 1中注册的账号。
-            repository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-//                authentication(userName: sonatypeUsername, password: sonatypePassword)
-                authentication(userName: '120011676', password: '19881008')
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+                authentication(userName: username, password: password)
             }
-            //构造项目的Pom文件，参见Part 2中Pom文件的规范，不要遗漏必填项
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: username, password: password)
+            }
+
             pom.project {
                 name project.name
+                groupId 'com.github.120011676'
+                version version
                 packaging 'jar'
                 description 'a http https util'
-                url siteUrl
+                url 'https://github.com/120011676/xhttp'
 
                 scm {
-                    url siteUrl
-                    connection gitUrl
-                    developerConnection gitUrl
+                    url 'https://github.com/120011676/xhttp'
+                    connection 'https://github.com/120011676/xhttp.git'
+                    developerConnection 'https://github.com/120011676/xhttp.git'
                 }
 
                 licenses {
@@ -71,51 +99,15 @@ uploadArchives {
     }
 }
 
-javadoc {
-    options {
-        encoding "UTF-8"
-        charSet 'UTF-8'
-        author true
-        version true
-        links "http://docs.oracle.com/javase/7/docs/api"
-        title "swipeJavaDoc"
-    }
-}
-
-//参见Part 2， 为项目生成**.jar/**-javadoc.jar/**-sources.jar
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
-//为所有的jar包做数字签名
 signing {
     sign configurations.archives
 }
 
-//Properties properties = new Properties()
-//properties.load(project.rootProject.file('local.properties').newDataInputStream())
-//bintray {
-//    user = properties.getProperty("bintray.user")
-//    key = properties.getProperty("bintray.apikey")
-//    configurations = ['archives']
-//    pkg {
-//        repo = "maven"
-//        name = "swipeView"                // project name in jcenter
-//        websiteUrl = siteUrl
-//        vcsUrl = gitUrl
-//        licenses = ["MIT"]
-//        publish = true
-//    }
-//}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'com.github.120011676'
+        }
+    }
+}
