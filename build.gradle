@@ -1,9 +1,13 @@
-group 'org.say'
+group 'com.github.120011676'
 version '1.0.0'
 
 apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
@@ -16,4 +20,94 @@ dependencies {
 task "mkdirs" << {
     sourceSets*.java.srcDirs*.each { it.mkdirs() }
     sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+}
+
+task source(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+        title "swipeJavaDoc"
+    }
+}
+
+task doc(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task mavenRelease(dependsOn: ['clean', 'doc', 'sources', 'jar']) {
+}
+
+artifacts {
+    archives jar
+    archives doc
+    archives source
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+                authentication(userName: username, password: password)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: username, password: password)
+            }
+
+            pom.project {
+                name project.name
+                groupId 'com.github.120011676'
+                version version
+                packaging 'jar'
+                description 'a http https util'
+                url 'https://github.com/120011676/xhttp'
+
+                scm {
+                    url 'https://github.com/120011676/xhttp'
+                    connection 'https://github.com/120011676/xhttp.git'
+                    developerConnection 'https://github.com/120011676/xhttp.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://mit-license.org/'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'Say.li'
+                        name 'Say.li'
+                        email '120011676@qq.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign configurations.archives
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'com.github.120011676'
+        }
+    }
 }
