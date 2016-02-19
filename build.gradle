@@ -106,7 +106,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            groupId = group
+            groupId = 'com.github.120011676'
         }
     }
 }
