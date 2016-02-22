@@ -1,4 +1,4 @@
-package org.say.xhttp;
+package com.github.q120011676.xhttp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,33 +25,33 @@ public class HttpResponse implements Response {
         this.httpUrl = httpURLConnection;
     }
 
-    @Override
+
     public Response character(String character) {
         this.character = character;
         return this;
     }
 
-    @Override
+
     public String header(String name) {
         return this.httpUrl.getHeaderField(name);
     }
 
-    @Override
+
     public Map<String, List<String>> header() {
         return this.httpUrl.getHeaderFields();
     }
 
-    @Override
+
     public String contentType() {
         return this.httpUrl.getContentType();
     }
 
-    @Override
+
     public String cookie() {
         return this.header(HttpHeader.SET_COOKIE);
     }
 
-    @Override
+
     public int code() {
         try {
             return this.httpUrl.getResponseCode();
@@ -61,7 +61,7 @@ public class HttpResponse implements Response {
         return -1;
     }
 
-    @Override
+
     public String message() {
         try {
             return this.httpUrl.getResponseMessage();
@@ -71,7 +71,7 @@ public class HttpResponse implements Response {
         return null;
     }
 
-    @Override
+
     public InputStream data() {
         try {
             return this.httpUrl.getInputStream();
@@ -94,9 +94,11 @@ public class HttpResponse implements Response {
         return null;
     }
 
-    @Override
+
     public String dataToString() {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); InputStream in = this.data()) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        InputStream in = this.data();
+        try {
             byte[] b = new byte[4096];
             if (in != null) {
                 for (int n; (n = in.read(b)) != -1; ) {
@@ -120,12 +122,17 @@ public class HttpResponse implements Response {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+            try {
+                baos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             this.close();
         }
         return null;
     }
 
-    @Override
+
     public void close() {
         if (this.data() != null) {
             try {
@@ -136,6 +143,16 @@ public class HttpResponse implements Response {
         }
         if (this.httpUrl != null) {
             this.httpUrl.disconnect();
+        }
+    }
+
+    public void handle(Handle handle) {
+        try {
+            handle.handle(this.httpUrl.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            this.close();
         }
     }
 }

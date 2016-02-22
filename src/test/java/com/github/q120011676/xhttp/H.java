@@ -1,4 +1,4 @@
-package org.say.xhttp;
+package com.github.q120011676.xhttp;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
