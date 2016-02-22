@@ -22,7 +22,7 @@ task "mkdirs" << {
     sourceSets*.resources.srcDirs*.each { it.mkdirs() }
 }
 
-task source(type: Jar) {
+task sourceJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
@@ -43,13 +43,13 @@ task doc(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
 }
 
-task mavenRelease(dependsOn: ['clean', 'doc', 'sources', 'jar']) {
+task mavenRelease(dependsOn: ['clean', 'doc', 'sourceJar', 'jar']) {
 }
 
 artifacts {
     archives jar
     archives doc
-    archives source
+    archives sourceJar
 }
 
 uploadArchives {
