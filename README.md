@@ -2,7 +2,32 @@
 一个java http操作工具
 
 # releases
-[v1.0.0](https://github.com/120011676/xhttp/releases)
+
+###### java 7:
+```xml
+<dependency>
+    <groupId>com.github.120011676</groupId>
+    <artifactId>xhttp-jdk_7</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
+###### java 5:
+```xml
+<dependency>
+    <groupId>com.github.120011676</groupId>
+    <artifactId>xhttp-jdk_5</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
+
+###### java 1.4:
+```xml
+<dependency>
+    <groupId>com.github.120011676</groupId>
+    <artifactId>xhttp-jdk_1.4</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
 
 # example
 
