@@ -1,4 +1,4 @@
-package org.say.xhttp;
+package com.github.q120011676.xhttp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -143,6 +143,16 @@ public class HttpResponse implements Response {
         }
         if (this.httpUrl != null) {
             this.httpUrl.disconnect();
+        }
+    }
+
+    public void handle(Handle handle) {
+        try {
+            handle.handle(this.httpUrl.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            this.close();
         }
     }
 }
