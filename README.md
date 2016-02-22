@@ -1,7 +1,7 @@
 # xhttp
 一个java http操作工具
 
-# releases
+# releases maven
 
 ###### java 7:
 ```xml
