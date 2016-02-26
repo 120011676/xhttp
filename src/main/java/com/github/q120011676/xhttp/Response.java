@@ -84,4 +84,8 @@ public interface Response {
      * @param handle Handle
      */
     void handle(Handle handle);
+
+    void download(String path);
+
+    void download(String path, String fileName);
 }
