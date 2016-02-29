@@ -85,7 +85,18 @@ public interface Response {
      */
     void handle(Handle handle);
 
+    /**
+     * download file
+     *
+     * @param path save file path
+     */
     void download(String path);
 
+    /**
+     * download file
+     *
+     * @param path     save file path
+     * @param fileName save file name
+     */
     void download(String path, String fileName);
 }

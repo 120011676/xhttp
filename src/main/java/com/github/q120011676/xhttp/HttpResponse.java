@@ -160,7 +160,7 @@ public class HttpResponse implements Response {
             if (HttpURLConnection.HTTP_OK == code()) {
                 String filename = null;
                 if (fileName == null) {
-                    String cd = header(HttpHeader.ContentDisposition);
+                    String cd = header(HttpHeader.CONTENT_DISPOSITION);
                     if (cd != null && !"".equals(cd.trim())) {
                         String[] str = cd.split(";");
                         for (String s : str) {
