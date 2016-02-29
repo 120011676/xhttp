@@ -1,8 +1,6 @@
 package com.github.q120011676;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.util.Map;
@@ -153,5 +151,62 @@ public class HttpResponse implements Response {
         } finally {
             this.close();
         }
+    }
+
+    public void download(String path) {
+        this.download(path, null);
+    }
+
+    public void download(final String path, final String fileName) {
+        this.handle(new Handle() {
+            public void handle(InputStream data) {
+                if (HttpURLConnection.HTTP_OK == code()) {
+                    String filename = null;
+                    if (fileName == null) {
+                        String cd = header(HttpHeader.CONTENT_DISPOSITION);
+                        if (cd != null && !"".equals(cd.trim())) {
+                            String[] str = cd.split(";");
+                            for (int i = 0; i < str.length; i++) {
+                                String[] kv = str[i].trim().split("=");
+                                if (kv.length > 1 && "filename".equals(kv[0].trim())) {
+                                    filename = kv[1].trim();
+                                    break;
+                                }
+                            }
+                        }
+                        if (filename == null) {
+                            String f = httpUrl.getURL().getFile();
+                            int in = f.indexOf("?");
+                            filename = !"".equals(f.trim()) ? f.substring(f.lastIndexOf("/") + 1, in > -1 ? in : f.length()) : null;
+                        }
+                    } else {
+                        filename = fileName;
+                    }
+                    if (filename == null) {
+                        throw new RuntimeException("fileName is null");
+                    }
+                    FileOutputStream fout = null;
+                    try {
+                        fout = new FileOutputStream(new File(path, filename));
+                        byte[] bs = new byte[8192];
+                        int size;
+                        while ((size = data.read(bs)) != -1) {
+                            fout.write(bs, 0, size);
+                        }
+                        fout.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (fout != null) {
+                            try {
+                                fout.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }
