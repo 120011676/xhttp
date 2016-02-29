@@ -1,8 +1,6 @@
 package com.github.q120011676.xhttp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.util.List;
@@ -25,32 +23,26 @@ public class HttpResponse implements Response {
         this.httpUrl = httpURLConnection;
     }
 
-
     public Response character(String character) {
         this.character = character;
         return this;
     }
 
-
     public String header(String name) {
         return this.httpUrl.getHeaderField(name);
     }
-
 
     public Map<String, List<String>> header() {
         return this.httpUrl.getHeaderFields();
     }
 
-
     public String contentType() {
         return this.httpUrl.getContentType();
     }
 
-
     public String cookie() {
         return this.header(HttpHeader.SET_COOKIE);
     }
-
 
     public int code() {
         try {
@@ -61,7 +53,6 @@ public class HttpResponse implements Response {
         return -1;
     }
 
-
     public String message() {
         try {
             return this.httpUrl.getResponseMessage();
@@ -70,7 +61,6 @@ public class HttpResponse implements Response {
         }
         return null;
     }
-
 
     public InputStream data() {
         try {
@@ -93,7 +83,6 @@ public class HttpResponse implements Response {
         }
         return null;
     }
-
 
     public String dataToString() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -132,7 +121,6 @@ public class HttpResponse implements Response {
         return null;
     }
 
-
     public void close() {
         if (this.data() != null) {
             try {
@@ -149,10 +137,65 @@ public class HttpResponse implements Response {
     public void handle(Handle handle) {
         try {
             handle.handle(this.httpUrl.getInputStream());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             this.close();
         }
+    }
+
+    public void download(String path) {
+        this.download(path, null);
+    }
+
+    public void download(final String path, final String fileName) {
+        this.handle(new Handle() {
+            public void handle(InputStream data) throws Exception {
+                if (HttpURLConnection.HTTP_OK == code()) {
+                    String filename = null;
+                    if (fileName == null) {
+                        String cd = header(HttpHeader.CONTENT_DISPOSITION);
+                        if (cd != null && !"".equals(cd.trim())) {
+                            String[] str = cd.split(";");
+                            for (int i = 0; i < str.length; i++) {
+                                String[] kv = str[i].trim().split("=");
+                                if (kv.length > 1 && "filename".equals(kv[0].trim())) {
+                                    filename = kv[1].trim();
+                                    break;
+                                }
+                            }
+                        }
+                        if (filename == null) {
+                            String f = httpUrl.getURL().getFile();
+                            int in = f.indexOf("?");
+                            filename = !"".equals(f.trim()) ? f.substring(f.lastIndexOf("/") + 1, in > -1 ? in : f.length()) : null;
+                        }
+                    } else {
+                        filename = fileName;
+                    }
+                    if (filename == null) {
+                        throw new RuntimeException("fileName is null");
+                    }
+                    FileOutputStream fout = null;
+                    try {
+                        fout = new FileOutputStream(new File(path, filename));
+                        byte[] bs = new byte[8192];
+                        int size;
+                        while ((size = data.read(bs)) != -1) {
+                            fout.write(bs, 0, size);
+                        }
+                        fout.flush();
+                    } finally {
+                        if (fout != null) {
+                            try {
+                                fout.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }

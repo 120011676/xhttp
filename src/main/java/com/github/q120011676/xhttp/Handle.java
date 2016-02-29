@@ -7,5 +7,5 @@ import java.io.InputStream;
  */
 public interface Handle {
 
-    void handle(InputStream data);
+    void handle(InputStream data) throws Exception;
 }
