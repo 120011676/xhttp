@@ -29,6 +29,6 @@ public class HttpHeader {
     public final static String X_POWERED_BY = "X-Powered-By";
     public final static String X_UA_COMPATIBLE = "X-UA-Compatible";
     public final static String P3P = "P3P";
-    public final static String ContentDisposition = "Content-Disposition";
+    public final static String CONTENT_DISPOSITION = "Content-Disposition";
 
 }
