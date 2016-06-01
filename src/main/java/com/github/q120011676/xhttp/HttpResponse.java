@@ -75,8 +75,8 @@ public class HttpResponse implements Response {
             return this.httpUrl.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
+            return this.httpUrl.getErrorStream();
         }
-        return null;
     }
 
     private String charset(String contentType) {
