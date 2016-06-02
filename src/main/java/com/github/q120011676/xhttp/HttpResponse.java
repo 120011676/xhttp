@@ -23,33 +23,33 @@ public class HttpResponse implements Response {
         this.httpUrl = httpURLConnection;
     }
 
-
+    @Override
     public Response character(String character) {
         this.character = character;
         return this;
     }
 
-
+    @Override
     public String header(String name) {
         return this.httpUrl.getHeaderField(name);
     }
 
-
+    @Override
     public Map<String, List<String>> header() {
         return this.httpUrl.getHeaderFields();
     }
 
-
+    @Override
     public String contentType() {
         return this.httpUrl.getContentType();
     }
 
-
+    @Override
     public String cookie() {
         return this.header(HttpHeader.SET_COOKIE);
     }
 
-
+    @Override
     public int code() {
         try {
             return this.httpUrl.getResponseCode();
@@ -59,7 +59,7 @@ public class HttpResponse implements Response {
         return -1;
     }
 
-
+    @Override
     public String message() {
         try {
             return this.httpUrl.getResponseMessage();
@@ -69,12 +69,26 @@ public class HttpResponse implements Response {
         return null;
     }
 
-
+    @Override
     public InputStream data() {
         try {
             return this.httpUrl.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public InputStream errorData() {
+        return this.httpUrl.getErrorStream();
+    }
+
+    @Override
+    public InputStream body() {
+        try {
+            return this.httpUrl.getInputStream();
+        } catch (IOException e) {
             return this.httpUrl.getErrorStream();
         }
     }
@@ -92,10 +106,13 @@ public class HttpResponse implements Response {
         return null;
     }
 
-
+    @Override
     public String dataToString() {
+        return read(this.data());
+    }
+
+    private String read(InputStream in) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        InputStream in = this.data();
         try {
             byte[] b = new byte[4096];
             if (in != null) {
@@ -130,7 +147,17 @@ public class HttpResponse implements Response {
         return null;
     }
 
+    @Override
+    public String errorDataToString() {
+        return this.read(this.errorData());
+    }
 
+    @Override
+    public String bodyToString() {
+        return this.read(this.body());
+    }
+
+    @Override
     public void close() {
         if (this.data() != null) {
             try {
@@ -144,6 +171,7 @@ public class HttpResponse implements Response {
         }
     }
 
+    @Override
     public void handle(Handle handle) {
         try {
             handle.handle(this.httpUrl.getInputStream());

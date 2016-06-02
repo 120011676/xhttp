@@ -60,18 +60,47 @@ public interface Response {
     String message();
 
     /**
-     * get response body
+     * get response success body
      *
      * @return response body
      */
     InputStream data();
 
     /**
+     * get response error body
+     *
+     * @return response body
+     */
+    InputStream errorData();
+
+    /**
+     * get response success or error body
+     *
+     * @return response body
+     */
+    InputStream body();
+
+    /**
      * get response body to String
+     *
+     * @return response success body to String
+     */
+    String dataToString();
+
+
+    /**
+     * get response error body to String
      *
      * @return response body to String
      */
-    String dataToString();
+    String errorDataToString();
+
+    /**
+     * get response success or error body
+     *
+     * @return response body
+     */
+    String bodyToString();
 
     /**
      * close connection
